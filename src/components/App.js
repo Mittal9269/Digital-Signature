@@ -4,6 +4,7 @@ import Navbar from './Navbar'
 import Main from './Main'
 import Web3 from 'web3';
 import './App.css';
+import Verify from "./Verify";
 
 const ipfsClient = require('ipfs-http-client')
 const ipfs = ipfsClient({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' })
@@ -35,7 +36,7 @@ class App extends Component {
     //Load account
     const accounts = await web3.eth.getAccounts()
     this.setState({ account: accounts[0] })
-    //Network ID
+    //Network ID 
     const networkId = await web3.eth.net.getId()
     const networkData = DStorage.networks[networkId]
     if (networkData) {
@@ -145,11 +146,16 @@ class App extends Component {
         <Navbar account={this.state.account} />
         {this.state.loading
           ? <div id="loader" className="text-center mt-5"><p>Loading...</p></div>
-          : <Main
+          : <>
+          <Main
             files={this.state.files}
             captureFile={this.captureFile}
             uploadFile={this.uploadFile}
           />
+          <Verify
+            files={this.state.files}
+           />
+          </>
         }
       </div>
     );
