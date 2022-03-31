@@ -1,11 +1,18 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import { convertBytes } from './helpers';
 import moment from 'moment'
 
-class Main extends Component {
+export default function Main(props){
 
-  render() {
-    return (
+  const [des , setDes] = useState('');
+
+  const changeValue = (e) => {
+      // console.log(e)
+      setDes(e.target.value)
+  }
+
+  return (
+    <>
       <div className="container-fluid mt-5 text-center">
         <div className="row">
           <main role="main" className="col-lg-12 ml-auto mr-auto" style={{ maxWidth: '1024px' }}>
@@ -16,20 +23,21 @@ class Main extends Component {
                 <h2 className="text-white text monospace bg-dark"><b><ins>Share File</ins></b></h2>
                 <form onSubmit={(event) => {
                   event.preventDefault()
-                  const description = this.fileDescription.value
-                  this.props.uploadFile(description)
+                  const description = des
+                  // console.log(description)
+                  props.uploadFile(description)
                 }} >
                   <div className="form-group">
                     <br></br>
                     <input
                       id="fileDescription"
                       type="text"
-                      ref={(input) => { this.fileDescription = input }}
+                      onChange={changeValue}
                       className="form-control text-monospace"
                       placeholder='description...'
                       required />
                   </div>
-                  <input type="file" onChange={this.props.captureFile} className="text-white text-monospace" required />
+                  <input type="file" onChange={props.captureFile} className="text-white text-monospace" required />
                   <button type="submit" className='btn-primary btn-block'>
                     <b>Upload!</b>
                   </button>
@@ -52,7 +60,7 @@ class Main extends Component {
                     <th scope='col' style={{ width: '120px' }}>hash/view/get</th>
                   </tr>
                 </thead>
-                {this.props.files.map((file, key) => {
+                {props.files && props.files.length && props.files.map((file, key) => {
                   return (
                     <thead style={{ 'fontSize': "12px" }} key={key}>
                       <tr>
@@ -87,8 +95,6 @@ class Main extends Component {
           </main>
         </div>
       </div>
-    );
-  }
+    </>
+  )
 }
-
-export default Main;

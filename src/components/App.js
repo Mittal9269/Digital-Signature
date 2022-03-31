@@ -1,5 +1,5 @@
 import DStorage from '../abis/DStorage.json'
-import React, { Component } from 'react';
+import React, {  useState,useLayoutEffect } from 'react';
 import Navbar from './Navbar'
 import Main from './Main'
 import Web3 from 'web3';
@@ -9,15 +9,25 @@ import Verify from "./Verify";
 const ipfsClient = require('ipfs-http-client')
 const ipfs = ipfsClient({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' })
 
+export default function App() {
+  const [account, setAccount] = useState('');
+  const [dstorage, setDstorage] = useState(null);
+  const [files, setFiles] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [type, setType] = useState(null);
+  const [name, setName] = useState(null);
+  const [fileCount, setFilecount] = useState(0);
+  const [buffer, setBuffer] = useState(null);
 
-class App extends Component {
+  useLayoutEffect( async () => {
+      await loadWEb3();
+      await loadBlockChainData();
 
-  async componentWillMount() {
-    await this.loadWeb3()
-    await this.loadBlockchainData()
-  }
 
-  async loadWeb3() {
+  }, [])
+
+
+  const loadWEb3 = async () => {
     if (window.ethereum) {
       window.web3 = new Web3(window.ethereum)
       await window.ethereum.enable()
@@ -28,66 +38,61 @@ class App extends Component {
     else {
       window.alert('Non-Ethereum browser detected. You should consider trying MetaMask!')
     }
+
   }
 
-  async loadBlockchainData() {
+  const loadBlockChainData = async () => {
     const web3 = window.web3
 
     //Load account
     const accounts = await web3.eth.getAccounts()
-    this.setState({ account: accounts[0] })
+    // this.setState({ account: accounts[0] })
+    setAccount(accounts[0]);
     //Network ID 
     const networkId = await web3.eth.net.getId()
     const networkData = DStorage.networks[networkId]
     if (networkData) {
       const dstorage = new web3.eth.Contract(DStorage.abi, networkData.address)
-      this.setState({ dstorage })
+      // this.setState({ dstorage })
+      setDstorage(dstorage);
       const filesCount = await dstorage.methods.fileCount().call()
-      this.setState({ filesCount })
+      // this.setState({ filesCount })
+      console.log(fileCount)
+      setFilecount(filesCount);
+
+      let tempStoreofFile = [];
       for (var i = filesCount; i >= 1; i--) {
         const file = await dstorage.methods.files(i).call()
-        this.setState({
-          files: [...this.state.files, file]
-        })
+        tempStoreofFile.push(file)
       }
+      setFiles(tempStoreofFile)
     } else {
       window.alert('DStorage contract not deployed to detect network.')
     }
-    this.setState({ loading: false })
-    //IF got connection, get data from contracts
-    //Assign contract
-
-    //Get files amount
-
-    //Load files&sort by the newest
-
-    //Else
-    //alert Error
-    this.setState({ loading: false })
+    setLoading(false)
   }
 
-  // Get file from user
-  captureFile = event => {
+
+
+  const captureFile = event => {
     event.preventDefault()
     const file = event.target.files[0]
     const reader = new window.FileReader()
 
     reader.readAsArrayBuffer(file)
     reader.onloadend = () => {
-      this.setState({
-        buffer: Buffer(reader.result),
-        type: file.type,
-        name: file.name
-      })
-      console.log('buffer', this.state.buffer)
+      setBuffer(Buffer(reader.result))
+      setType(file.type)
+      setName(file.name)
+      console.log('buffer', buffer)
     }
   }
 
   //Upload File
-  uploadFile = description => {
+  const uploadFile = description => {
     console.log("submitting to IPFS.....")
     //Add file to the IPFS
-    ipfs.add(this.state.buffer, (error, result) => {
+    ipfs.add(buffer, (error, result) => {
       console.log('IPFS result', result)
 
       if (error) {
@@ -95,22 +100,25 @@ class App extends Component {
         return
       }
 
-      this.setState({ loading: true })
+      setLoading(true)
 
-      if (this.state.type === '') {
-        this.setState({ type: 'none' })
+      if (type === '') {
+        setType('none')
       }
-
-      this.state.dstorage.methods.uploadFile(result[0].hash, result[0].size, this.state.type, this.state.name, description).send({ from: this.state.account }).on('transactionHash', (hash) => {
-        this.setState({
-          loading: false,
-          type: null,
-          name: null
-        })
+      
+      // console.log(buffer)
+      dstorage.methods.uploadFile(result[0].hash, result[0].size, type, name, description).send({ from: account }).on('transactionHash', (hash) => {
+        setLoading(false)
+        setType(null)
+        setName(null)
+      // this.setState({ filesCount })
+        console.log(fileCount)
         window.location.reload()
+        // console.log(hash)
       }).on('error', (e) => {
         window.alert('Error')
-        this.setState({ loading: false })
+        console.log(e)
+        setLoading(false)
       })
 
     })
@@ -125,41 +133,26 @@ class App extends Component {
 
   }
 
-  //Set states
-  constructor(props) {
-    super(props)
-    this.state = {
-      account: '',
-      dstorage: null,
-      files: [],
-      loading: false,
-      type: null,
-      name: null
-    }
-
-    //Bind functions
-  }
-
-  render() {
-    return (
+  return (
+    <>
       <div>
-        <Navbar account={this.state.account} />
-        {this.state.loading
+        <Navbar account={account} />
+        {loading
           ? <div id="loader" className="text-center mt-5"><p>Loading...</p></div>
           : <>
-          <Main
-            files={this.state.files}
-            captureFile={this.captureFile}
-            uploadFile={this.uploadFile}
-          />
-          <Verify
-            files={this.state.files}
-           />
+            <Main
+              files={files}
+              captureFile={captureFile}
+              uploadFile={uploadFile}
+            />
+            <Verify
+              files={files}
+            />
           </>
         }
       </div>
-    );
-  }
+    </>
+  )
 }
 
-export default App;
+// export default App;
