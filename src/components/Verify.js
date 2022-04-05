@@ -1,4 +1,7 @@
 import React, {useState} from 'react';
+import { PDFDocument } from 'pdf-lib';
+
+// 919934576820-b77pvk0cqk5u9jj7rnd3lhdr06ls7o59.apps.googleusercontent.com
 
 const ipfsClient = require('ipfs-http-client')
 const ipfs = ipfsClient({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' })
@@ -6,11 +9,46 @@ const ipfs = ipfsClient({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' 
 
 export default function Verify(props){
 
-    
-    const [type, setType] = useState(null);
-    const [name, setName] = useState(null);
+
     const [buffer, setBuffer] = useState(null);
     const [des , setDes] = useState('');
+
+
+
+    const MergePDF = async (pdf1) => {
+        try{
+          const cover1 = await PDFDocument.load(pdf1);
+          const doc =  await PDFDocument.create();
+    
+          const contentPage1 = await doc.copyPages(cover1 , cover1.getPageIndices());
+          let length = contentPage1.length;
+          let index = 0;
+            for(let page of contentPage1){
+                if(index !== length - 1){
+                    doc.addPage(page); 
+                }
+              index++;
+            }
+            const pdfBytes = await doc.save();
+    
+            // let bytes = new Uint8Array(pdfBytes); // pass your byte response to this constructor
+    
+            // var blob = new Blob([bytes], { type: "application/pdf" });
+            // var url = URL.createObjectURL(blob);
+            // window.open(url, "_blank"); 
+            console.log(buffer);
+            console.log(pdfBytes);
+            const buf = Buffer.from(pdfBytes, 'base64');
+            // console.log(buf);
+            return buf;
+        }
+        catch{
+            console.log("Error occured\n"); 
+        }
+    
+      }
+    
+
 
     const captureFile = event => {
         event.preventDefault()
@@ -20,35 +58,37 @@ export default function Verify(props){
         reader.readAsArrayBuffer(file)
         reader.onloadend = () => {
             setBuffer(Buffer(reader.result))
-            setType(file.type)
-            setName(file.name)
             console.log('buffer', buffer)
         }
     }
 
     //Upload File
     const uploadFile = description => {
-        console.log("happy holi");
-        ipfs.add(buffer, (error, result) => {
-            console.log('IPFS result', result)
 
-            if (error) {
-                console.error(error)
-                return
-            }
-
-            if(props.files){
-            for (let i = 0; i < props.files.length; i++) {
-                if (props.files[i].fileHash === result[0].hash && props.files[i].uploader === description) {
-                    if (!alert('Successfully verfied, no temper')) { window.location.reload(); }
+        MergePDF(buffer).then(newBuffer =>{
+            ipfs.add(newBuffer, (error, result) => {
+                console.log('IPFS result', result)
+    
+                if (error) {
+                    console.error(error)
+                    return
                 }
+    
+                if(props.files){
+                for (let i = 0; i < props.files.length; i++) {
+                    if (props.files[i].fileHash === result[0].hash && props.files[i].uploader === description) {
+                        if (!alert('Successfully verfied, no temper')) { window.location.reload(); }
+                    }
+                }
+                if (!alert('Successfully verfied, temper')) { window.location.reload(); }
+            }else{
+                if (!alert('Something is wrong')) { window.location.reload(); }
             }
-            if (!alert('Successfully verfied, temper')) { window.location.reload(); }
-        }else{
-            if (!alert('Something is wrong')) { window.location.reload(); }
-        }
-
+    
+            })
         })
+        .catch(err => console.log(err))
+        
     }
 
     return (
@@ -63,7 +103,6 @@ export default function Verify(props){
                                 <h2 className="text-white text monospace bg-dark"><b><ins>Verify File</ins></b></h2>
                                 <form onSubmit={(event) => {
                                     event.preventDefault()
-                                    {console.log(des)}
                                     uploadFile(des)
                                 }} >
                                     <div className="form-group">
