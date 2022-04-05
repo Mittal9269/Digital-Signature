@@ -47,7 +47,7 @@ export default function Main(props){
               <p>&nbsp;</p>
 
               {/* Create Table*/}
-              <table className="table-sm table-bordered text-monospace" style={{ width: '1000px', maxHeight: '450px' }}>
+              <table className="table-sm table-bordered text-monospace table-hover" style={{ width: '1000px', maxHeight: '450px' }}>
                 <thead style={{ 'fontSize': '15px' }}>
                   <tr className='bg-dark text-white'>
                     <th scope='col' style={{ width: '10px' }}>id</th>

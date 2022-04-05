@@ -32,7 +32,7 @@ export default function DashBorad() {
             }
         }
         else{
-            if (!alert('Please login with iitdh ID!')) { window.location.reload(); }
+            if (!alert('Please login with iitdh email ID!')) { window.location.reload(); }
         }
     }
     const responseErrorGoogle = (response) => {
@@ -44,7 +44,8 @@ export default function DashBorad() {
     return (
         <>
             {redirect && <Navigate to="/app" />}
-            <div className="container-fluid mt-5 text-center">
+            
+            <div className="container-fluid mt-5 text-center ">
                 <div className="row">
                     <main role="main" className="col-lg-12 ml-auto mr-auto" style={{ maxWidth: '1024px' }}>
                         <div className="content">
@@ -54,7 +55,7 @@ export default function DashBorad() {
                                 <h2 className="text-white text monospace bg-dark"><b><ins>LOGIN</ins></b></h2>
                                 <GoogleLogin
                                     clientId={process.env.REACT_APP_CLIENTID}
-                                    buttonText="Login"
+                                    buttonText="Login via Google"
                                     onSuccess={responseSuccessGoogle}
                                     onFailure={responseErrorGoogle}
                                     cookiePolicy={'single_host_origin'}
@@ -67,6 +68,7 @@ export default function DashBorad() {
                     </main>
                 </div>
             </div>
+            
         </>
     )
 }

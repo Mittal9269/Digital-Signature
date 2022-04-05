@@ -77,12 +77,12 @@ export default function Verify(props){
                 if(props.files){
                 for (let i = 0; i < props.files.length; i++) {
                     if (props.files[i].fileHash === result[0].hash && props.files[i].uploader === description) {
-                        if (!alert('Successfully verfied, no temper')) { window.location.reload(); }
+                        if (!alert('The file has been Successfully verfied, Result : No temper/modification in the file')) { window.location.reload(); }
                     }
                 }
-                if (!alert('Successfully verfied, temper')) { window.location.reload(); }
+                if (!alert('The file has been Successfully verfied, Result : The file has been tempered/modified')) { window.location.reload(); }
             }else{
-                if (!alert('Something is wrong')) { window.location.reload(); }
+                if (!alert('Something is wrong!!')) { window.location.reload(); }
             }
     
             })
