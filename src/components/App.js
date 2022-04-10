@@ -7,7 +7,7 @@ import Web3 from 'web3';
 import './App.css';
 import Verify from "./Verify";
 import jsPDF from "jspdf";
-import { PDFDocument } from 'pdf-lib';
+import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import { useCookies } from 'react-cookie';
 import { Navigate, NavLink } from 'react-router-dom';
 
@@ -24,18 +24,17 @@ export default function App() {
   const [name, setName] = useState(null);
   const [fileCount, setFilecount] = useState(0);
   const [buffer, setBuffer] = useState(null);
-  const [cookies, setCookie, removeCookie] = useCookies(['user']);
+  const [cookies] = useCookies(['user']);
   const [redirect, setRedirect] = useState(false);
+  const [fileHashObject , setFileHashObject] = useState({})
+
 
 
   useLayoutEffect( async () => {
     if (cookies.jwttoken) {}
     else { setRedirect(true); }
-
-
       await loadWEb3();
       await loadBlockChainData();
-    console.log(fileCount)
 
   }, [])
 
@@ -59,23 +58,27 @@ export default function App() {
 
     //Load account
     const accounts = await web3.eth.getAccounts()
-    // this.setState({ account: accounts[0] })
     setAccount(accounts[0]);
     //Network ID 
     const networkId = await web3.eth.net.getId()
     const networkData = DStorage.networks[networkId]
     if (networkData) {
       const dstorage = new web3.eth.Contract(DStorage.abi, networkData.address)
-      // this.setState({ dstorage })
       setDstorage(dstorage);
       const filesCount = await dstorage.methods.fileCount().call()
-      // this.setState({ filesCount })
       setFilecount(filesCount);
 
       let tempStoreofFile = [];
       for (var i = filesCount; i >= 1; i--) {
         const file = await dstorage.methods.files(i).call()
-        tempStoreofFile.push(file)
+        try{
+          fileHashObject[file.fileHash] = file.uploader;
+          setFileHashObject({...fileHashObject})
+          tempStoreofFile.push(file)
+        }
+        catch{
+          console.log("error occured");
+        }
       }
       setFiles(tempStoreofFile)
     } else {
@@ -105,9 +108,7 @@ export default function App() {
     const doc = new jsPDF();
     doc.setFontSize(40)
     doc.text(35, 25, 'Signed with DAPP')
-      // console.log(doc)
     const arraybuffer = doc.output("arraybuffer", "multiPng.pdf");
-    // console.log(arraybuffer)
     return arraybuffer;
   }
 
@@ -130,11 +131,6 @@ export default function App() {
 
         const pdfBytes = await doc.save();
 
-        let bytes = new Uint8Array(pdfBytes); // pass your byte response to this constructor
-
-        var blob = new Blob([bytes], { type: "application/pdf" });
-        var url = URL.createObjectURL(blob);
-        window.open(url, "_blank");
         const buf = Buffer.from(pdfBytes, 'base64');
         return buf;
     }
@@ -144,43 +140,56 @@ export default function App() {
 
   }
 
+
+  
+
   //Upload File
-  const uploadFile = description => {
+  const uploadFile = (description, pageNumbers) => {
     console.log("submitting to IPFS.....")
     //Add file to the IPFS
-    ipfs.add(buffer, (error, result) => {
-      console.log('IPFS result', result)
+    MergePDF(buffer , CreatLastPagePDF())
+    .then(newBuff => {
+      ipfs.add(newBuff , (error, result) => {
+        console.log('IPFS result', result)
+  
+        if (error) {
+          console.error(error)
+          return
+        }
+  
+        setLoading(true)
+  
+        if (type === '') {
+          setType('none')
+        }
+        
+        
+  
+  
+        dstorage.methods.uploadFile(result[0].hash, result[0].size, type, name, description).send({ from: account }).on('transactionHash', (hash) => {
+          setLoading(false)
+          setType(null)
+          setName(null)
 
-      if (error) {
-        console.error(error)
-        return
-      }
+          let bytes = new Uint8Array(newBuff); // pass your byte response to this constructor
 
-      setLoading(true)
-
-      if (type === '') {
-        setType('none')
-      }
-      
-      // console.log(buffer)
-      
+          var blob = new Blob([bytes], { type: "application/pdf" });
+          var url = URL.createObjectURL(blob);
+          window.open(url, "_blank");
 
 
-      dstorage.methods.uploadFile(result[0].hash, result[0].size, type, name, description).send({ from: account }).on('transactionHash', (hash) => {
-        setLoading(false)
-        setType(null)
-        setName(null)
-        console.log(MergePDF(buffer , CreatLastPagePDF()));
-      
-        window.location.reload()
 
-      }).on('error', (e) => {
-        window.alert('Error')
-        console.log(e)
-        setLoading(false)
+          window.location.reload()
+  
+        }).on('error', (e) => {
+          window.alert('Error')
+          console.log(e)
+          setLoading(false)
+        })
+  
       })
-
     })
+    .catch(err => console.log(err))
     //Check If error
     //Return error
 
@@ -192,9 +201,6 @@ export default function App() {
 
   }
 
-  const LogoutFunction = (e) => {
-    
-  }
 
   return (
     <>
@@ -219,6 +225,7 @@ export default function App() {
             />
             <Verify
               files={files}
+              HashObject={fileHashObject}
             />
           </>
         }

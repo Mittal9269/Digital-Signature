@@ -5,11 +5,10 @@ import moment from 'moment'
 export default function Main(props){
 
   const [des , setDes] = useState('');
+  const [pages , Setpages] = useState('');
 
-  const changeValue = (e) => {
-      // console.log(e)
-      setDes(e.target.value)
-  }
+  const changeValue = (e) => {  setDes(e.target.value) }
+  const changeValueForpages = (e) => {  Setpages(e.target.value) }
 
   return (
     <>
@@ -24,8 +23,7 @@ export default function Main(props){
                 <form onSubmit={(event) => {
                   event.preventDefault()
                   const description = des
-                  // console.log(description)
-                  props.uploadFile(description)
+                  props.uploadFile(description , pages)
                 }} >
                   <div className="form-group">
                     <br></br>
@@ -34,7 +32,17 @@ export default function Main(props){
                       type="text"
                       onChange={changeValue}
                       className="form-control text-monospace"
-                      placeholder='description...'
+                      placeholder='Description...'
+                      required />
+                  </div>
+                  <div className="form-group">
+                    <br></br>
+                    <input
+                      id="fileDescription"
+                      type="text"
+                      onChange={changeValueForpages}
+                      className="form-control text-monospace"
+                      placeholder='page numbers with comma sperate only'
                       required />
                   </div>
                   <input type="file" onChange={props.captureFile} className="text-white text-monospace" required />

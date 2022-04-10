@@ -1,53 +1,46 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import { PDFDocument } from 'pdf-lib';
 
-// 919934576820-b77pvk0cqk5u9jj7rnd3lhdr06ls7o59.apps.googleusercontent.com
 
 const ipfsClient = require('ipfs-http-client')
 const ipfs = ipfsClient({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' })
 
 
-export default function Verify(props){
+export default function Verify(props) {
 
 
     const [buffer, setBuffer] = useState(null);
-    const [des , setDes] = useState('');
+    const [des, setDes] = useState('');
 
 
 
     const MergePDF = async (pdf1) => {
-        try{
-          const cover1 = await PDFDocument.load(pdf1);
-          const doc =  await PDFDocument.create();
-    
-          const contentPage1 = await doc.copyPages(cover1 , cover1.getPageIndices());
-          let length = contentPage1.length;
-          let index = 0;
-            for(let page of contentPage1){
-                if(index !== length - 1){
-                    doc.addPage(page); 
+        try {
+            const cover1 = await PDFDocument.load(pdf1);
+            const doc = await PDFDocument.create();
+
+            const contentPage1 = await doc.copyPages(cover1, cover1.getPageIndices());
+            let length = contentPage1.length;
+            let index = 0;
+            for (let page of contentPage1) {
+                if (index !== length - 1) {
+                    doc.addPage(page);
                 }
-              index++;
+                index++;
             }
             const pdfBytes = await doc.save();
-    
-            // let bytes = new Uint8Array(pdfBytes); // pass your byte response to this constructor
-    
-            // var blob = new Blob([bytes], { type: "application/pdf" });
-            // var url = URL.createObjectURL(blob);
-            // window.open(url, "_blank"); 
+
             console.log(buffer);
             console.log(pdfBytes);
             const buf = Buffer.from(pdfBytes, 'base64');
-            // console.log(buf);
             return buf;
         }
-        catch{
-            console.log("Error occured\n"); 
+        catch {
+            console.log("Error occured\n");
         }
-    
-      }
-    
+
+    }
+
 
 
     const captureFile = event => {
@@ -65,30 +58,25 @@ export default function Verify(props){
     //Upload File
     const uploadFile = description => {
 
-        MergePDF(buffer).then(newBuffer =>{
-            ipfs.add(newBuffer, (error, result) => {
+        MergePDF(buffer).then(newBuffer => {
+            ipfs.add(buffer, (error, result) => {
                 console.log('IPFS result', result)
-    
+
                 if (error) {
                     console.error(error)
                     return
                 }
-    
-                if(props.files){
-                for (let i = 0; i < props.files.length; i++) {
-                    if (props.files[i].fileHash === result[0].hash && props.files[i].uploader === description) {
-                        if (!alert('Successfully verfied, no temper')) { window.location.reload(); }
-                    }
+
+                if (props.HashObject && (result[0].hash in props.HashObject) && description === props.HashObject[result[0].hash]) {
+                    if (!alert('Successfully verfied, no temper')) { window.location.reload(); }
+                } else {
+                    if (!alert('Successfully verfied, temper')) { window.location.reload(); }
                 }
-                if (!alert('Successfully verfied, temper')) { window.location.reload(); }
-            }else{
-                if (!alert('Something is wrong')) { window.location.reload(); }
-            }
-    
+
             })
         })
-        .catch(err => console.log(err))
-        
+            .catch(err => console.log(err))
+
     }
 
     return (

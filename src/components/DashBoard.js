@@ -12,15 +12,13 @@ export default function DashBorad() {
     useEffect(() => {
         if (!cookies.jwttoken) {}
         else { setRedirect(true); }
-    }, [])
+    }, [cookies.jwttoken])
 
     const responseSuccessGoogle = (response) => {
-        // console.log(response.profileObj);
         const email = response.profileObj.email
+        localStorage.setItem('Name', JSON.stringify(response.profileObj.name));
         if(email.slice(-12) === "@iitdh.ac.in"){
-            
             if(response.profileObj.googleId !== null){
-                // sessionStorage.setItem('key', );
                 setCookie('jwttoken', response.profileObj.googleId, {
                     path: '/', 
                     expires: new Date(Date.now() + 48 * 360000)

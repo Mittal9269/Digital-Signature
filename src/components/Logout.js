@@ -4,7 +4,7 @@ import { useCookies } from 'react-cookie';
 
 export default function Logout(){
 
-    const [cookies, setCookie , removeCookie] = useCookies(['user']);
+    const [,  , removeCookie] = useCookies(['user']);
     return (
         <>
             {sessionStorage.clear()}

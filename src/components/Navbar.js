@@ -9,8 +9,7 @@ class Navbar extends Component {
       <nav className="navbar navbar-dark bg-dark p-0 text-monospace">
         <a
           className="navbar-brand col-sm-3 col-md-2 mr-0"
-          href="http://www.dappuniversity.com/bootcamp"
-          target="_blank"
+          href="/"
           rel="noopener noreferrer"
         >
           <img src={box} width="30" height="30" className="align-top" alt="" />
@@ -24,7 +23,7 @@ class Navbar extends Component {
                 className='text-white'
                 rel="noopener noreferrer"
                 href={"https://etherscan.io/address/" + this.props.account}>
-                {this.props.account ? this.props.account.substring(0, 6) : '0x0'}...{this.props.account ? this.props.account.substring(38, 42) : '0x0'}
+                {localStorage.getItem('Name') ? JSON.parse(localStorage.getItem('Name')) : ''}
               </a>
             </small>
             {this.props.account

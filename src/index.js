@@ -1,9 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import 'bootstrap/dist/css/bootstrap.css'
-// import App from './components/App';
 import Home from './components/Home';
-// import DashBorad from './components/DashBoard';
 import * as serviceWorker from './serviceWorker';
 import { CookiesProvider } from 'react-cookie';
 
