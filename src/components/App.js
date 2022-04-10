@@ -1,6 +1,6 @@
 import DStorage from '../abis/DStorage.json'
 import React from 'react';
-import {  useState,useLayoutEffect } from 'react';
+import { useState, useLayoutEffect } from 'react';
 import Navbar from './Navbar'
 import Main from './Main'
 import Web3 from 'web3';
@@ -26,15 +26,15 @@ export default function App() {
   const [buffer, setBuffer] = useState(null);
   const [cookies] = useCookies(['user']);
   const [redirect, setRedirect] = useState(false);
-  const [fileHashObject , setFileHashObject] = useState({})
+  const [fileHashObject, setFileHashObject] = useState({})
 
 
 
-  useLayoutEffect( async () => {
-    if (cookies.jwttoken) {}
+  useLayoutEffect(async () => {
+    if (cookies.jwttoken) { }
     else { setRedirect(true); }
-      await loadWEb3();
-      await loadBlockChainData();
+    await loadWEb3();
+    await loadBlockChainData();
 
   }, [])
 
@@ -71,12 +71,12 @@ export default function App() {
       let tempStoreofFile = [];
       for (var i = filesCount; i >= 1; i--) {
         const file = await dstorage.methods.files(i).call()
-        try{
+        try {
           fileHashObject[file.fileHash] = file.uploader;
-          setFileHashObject({...fileHashObject})
+          setFileHashObject({ ...fileHashObject })
           tempStoreofFile.push(file)
         }
-        catch{
+        catch {
           console.log("error occured");
         }
       }
@@ -104,92 +104,113 @@ export default function App() {
   }
 
 
-  const CreatLastPagePDF = () =>{
-    const doc = new jsPDF();
-    doc.setFontSize(40)
-    doc.text(35, 25, 'Signed with DAPP')
-    const arraybuffer = doc.output("arraybuffer", "multiPng.pdf");
-    return arraybuffer;
-  }
 
-  const MergePDF = async (pdf1 , pdf2) => {
-    try{
-      const cover1 = await PDFDocument.load(pdf1);
-      const cover2 = await PDFDocument.load(pdf2);
 
-      const doc =  await PDFDocument.create();
+  const ModifyPDF = async (pdf, description) => {
+    try {
+      const pdfDoc = await PDFDocument.load(pdf)
 
-      const contentPage1 = await doc.copyPages(cover1 , cover1.getPageIndices());
-        for(let page of contentPage1){
-          doc.addPage(page);
+      // Embed the Helvetica font
+      const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica)
+
+      // Get the first page of the document
+
+      let Newdescription = description.trim()
+      var nameArr = Newdescription.split(',')
+      const pages = pdfDoc.getPages()
+      const d = {};
+      nameArr.forEach((element) => {
+        const index = parseInt(element);
+        if (index !== null && index < pages.length && !(index in d)) {
+          d[index] = 1;
+          let firstPage = pages[index];
+          const { width, height } = firstPage.getSize()
+          firstPage.drawText('Signed from DAPP', {
+            x: 25,
+            y: height - 300,
+            size: 25,
+            font: helveticaFont,
+            color: rgb(0.95, 0.1, 0.1),
+            opacity: 0.3
+          })
+        }
+        else {
+          if (!alert('Invalid input please write page numbers with comma saprate only')) { window.location.reload(); }
         }
 
-        const contentPage2 = await doc.copyPages(cover2 , cover2.getPageIndices());
-        for(let page of contentPage2){
-          doc.addPage(page);
-        }
+      });
 
-        const pdfBytes = await doc.save();
+      // Get the width and height of the first page
 
-        const buf = Buffer.from(pdfBytes, 'base64');
-        return buf;
+      // Draw a string of text diagonally across the first page
+
+
+      // Serialize the PDFDocument to bytes (a Uint8Array)
+      const pdfBytes = await pdfDoc.save()
+
+
+
+      const buf = Buffer.from(pdfBytes, 'base64');
+      return buf;
     }
-    catch{
-        console.log("Error occured\n"); 
+    catch {
+      console.log("Error occured\n");
     }
+
+
 
   }
 
 
-  
+
 
   //Upload File
   const uploadFile = (description, pageNumbers) => {
     console.log("submitting to IPFS.....")
     //Add file to the IPFS
-    MergePDF(buffer , CreatLastPagePDF())
-    .then(newBuff => {
-      ipfs.add(newBuff , (error, result) => {
-        console.log('IPFS result', result)
-  
-        if (error) {
-          console.error(error)
-          return
-        }
-  
-        setLoading(true)
-  
-        if (type === '') {
-          setType('none')
-        }
-        
-        
-  
-  
-        dstorage.methods.uploadFile(result[0].hash, result[0].size, type, name, description).send({ from: account }).on('transactionHash', (hash) => {
-          setLoading(false)
-          setType(null)
-          setName(null)
+    ModifyPDF(buffer , pageNumbers)
+      .then(newBuff => {
+        ipfs.add(newBuff, (error, result) => {
+          console.log('IPFS result', result)
 
-          let bytes = new Uint8Array(newBuff); // pass your byte response to this constructor
+          if (error) {
+            console.error(error)
+            return
+          }
 
-          var blob = new Blob([bytes], { type: "application/pdf" });
-          var url = URL.createObjectURL(blob);
-          window.open(url, "_blank");
+          setLoading(true)
+
+          if (type === '') {
+            setType('none')
+          }
 
 
 
-          window.location.reload()
-  
-        }).on('error', (e) => {
-          window.alert('Error')
-          console.log(e)
-          setLoading(false)
+
+          dstorage.methods.uploadFile(result[0].hash, result[0].size, type, name, description).send({ from: account }).on('transactionHash', (hash) => {
+            setLoading(false)
+            setType(null)
+            setName(null)
+
+            let bytes = new Uint8Array(newBuff); // pass your byte response to this constructor
+
+            var blob = new Blob([bytes], { type: "application/pdf" });
+            var url = URL.createObjectURL(blob);
+            window.open(url, "_blank");
+
+
+
+            window.location.reload()
+
+          }).on('error', (e) => {
+            window.alert('Error')
+            console.log(e)
+            setLoading(false)
+          })
+
         })
-  
       })
-    })
-    .catch(err => console.log(err))
+      .catch(err => console.log(err))
     //Check If error
     //Return error
 
@@ -210,14 +231,14 @@ export default function App() {
         {loading
           ? <div id="loader" className="text-center mt-5"><p>Loading...</p></div>
           : <>
-          <NavLink
-                    exact
-                    activeClassName="menu_active"
-                    className="btn btn-danger"
-                    to="/logout"
-                >
-                    Logout
-                </NavLink>
+            <NavLink
+              exact
+              activeClassName="menu_active"
+              className="btn btn-danger"
+              to="/logout"
+            >
+              Logout
+            </NavLink>
             <Main
               files={files}
               captureFile={captureFile}
