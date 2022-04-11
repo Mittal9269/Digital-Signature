@@ -119,13 +119,18 @@ export default function App() {
       var nameArr = Newdescription.split(',')
       const pages = pdfDoc.getPages()
       const d = {};
+      const time = new Date();
+      const userName = localStorage.getItem('Name') ? JSON.parse(localStorage.getItem('Name')) : 'Dapp User';
+
+      const InsertString =  `Signed by  ${userName} \n ${time.toDateString()} ${time.toLocaleTimeString()}`;
+
       nameArr.forEach((element) => {
         const index = parseInt(element);
-        if (index !== null && index < pages.length && !(index in d)) {
-          d[index] = 1;
-          let firstPage = pages[index];
+        if (index !== null && index>= 1 && index <= pages.length && !(index in d)) {
+          d[index-1] = 1;
+          let firstPage = pages[index-1];
           const { width, height } = firstPage.getSize()
-          firstPage.drawText('Signed from DAPP', {
+          firstPage.drawText(InsertString, {
             x: 25,
             y: height - 300,
             size: 25,
