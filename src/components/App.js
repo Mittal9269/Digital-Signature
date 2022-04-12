@@ -140,7 +140,7 @@ export default function App() {
           })
         }
         else {
-          if (!alert('Invalid input please write page numbers with comma saprate only')) { window.location.reload(); }
+          if (!alert('Invalid input please write page numbers with comma separated  only')) { window.location.reload(); }
         }
 
       });

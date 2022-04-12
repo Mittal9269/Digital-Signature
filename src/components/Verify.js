@@ -68,9 +68,9 @@ export default function Verify(props) {
                 }
 
                 if (props.HashObject && (result[0].hash in props.HashObject) && description === props.HashObject[result[0].hash]) {
-                    if (!alert('Successfully verfied, no temper')) { window.location.reload(); }
+                    if (!alert('The file has been Successfully verfied, Result : No temper/modification in the file')) { window.location.reload(); }
                 } else {
-                    if (!alert('Successfully verfied, temper')) { window.location.reload(); }
+                    if (!alert('The file has been Successfully verfied, Result : The file has been tempered/modified or Not been signed with DApp')) { window.location.reload(); }
                 }
 
             })

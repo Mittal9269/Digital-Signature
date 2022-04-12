@@ -42,7 +42,7 @@ export default function Main(props){
                       type="text"
                       onChange={changeValueForpages}
                       className="form-control text-monospace"
-                      placeholder='page numbers with comma sperate only'
+                      placeholder='page numbers with comma separated only'
                       required />
                   </div>
                   <input type="file" onChange={props.captureFile} className="text-white text-monospace" required />
