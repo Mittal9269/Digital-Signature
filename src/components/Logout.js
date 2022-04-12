@@ -9,6 +9,7 @@ export default function Logout(){
         <>
             {sessionStorage.clear()}
             {removeCookie('jwttoken')}
+            {window.location.reload()}
             <Navigate to="/" />
         </>
     
