@@ -19,7 +19,7 @@ export default function Main(props){
               <p>&nbsp;</p>
 
               <div className="card mb-3 mx-auto bg-dark" style={{ maxWidth: '512px' }}>
-                <h2 className="text-white text monospace bg-dark"><b><ins>Share File</ins></b></h2>
+                <h2 className="text-white text monospace bg-dark"><b><ins>Sign a PDF File</ins></b></h2>
                 <form onSubmit={(event) => {
                   event.preventDefault()
                   const description = des
@@ -79,12 +79,7 @@ export default function Main(props){
                         <td>{convertBytes(file.fileSize)}</td>
                         <td>{moment.unix(file.uploadTime).format('h:mm:ss A M/D/Y')}</td>
                         <td>
-                          <a
-                            href={"https://etherscan.io/address/" + file.uploader}
-                            rel="noopener noreferrer"
-                            target='_blank'>
-                            {file.uploader.substring(0, 10)}...
-                          </a>
+                            {file.uploader}
                         </td>
                         <td>
                           <a

@@ -179,7 +179,7 @@ export default function App() {
           console.log('IPFS result', result)
 
           if (error) {
-            console.error(error)
+            if (!alert('Please Upload a PDF file')) { window.location.reload(); }
             return
           }
 
@@ -215,7 +215,9 @@ export default function App() {
 
         })
       })
-      .catch(err => console.log(err))
+      .catch(err =>{
+        if (!alert('Internal Error please try again!')) { window.location.reload(); }
+      })
     //Check If error
     //Return error
 
