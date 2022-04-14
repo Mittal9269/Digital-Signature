@@ -25,9 +25,9 @@ It gave us all the tools that we needed to start working on our application.
 ### **About the software:**
 The software we're working on will allow a user to digitally sign and verify a document's authenticity. In our current version, a single user can sign a document at multiple pages. Note that the verification of those signatures would not be accepted partially since it violates the integrity of the document. (For example, suppose a person signs on 4 pages of a 10 page document. So, if that pdf is split and then the verification for only a part of those pages is asked, then our software won’t accept such a signature).
 
-![](Aspose.Words.4ed841ba-c4a1-427f-9c82-ad453c830393.001.jpeg)
+![](https://ibb.co/KhyJBPq)
 
-![](Aspose.Words.4ed841ba-c4a1-427f-9c82-ad453c830393.002.jpeg)
+![](https://ibb.co/x2j3LVr)
 
 ### **Tools and Technologies Used:**
 - Frontend:
@@ -89,34 +89,7 @@ After getting the hash, this hash will be checked in the Dstorage(our blockchain
 1. The FileUploaded event is emitted simultaneously on successful uploading.
 1. With the truffle migration, the contract will be converted to the json format in ABI file which is used to interact with the frontend of the application.
 1. The smart contract handles all kinds of requests and completes it according to the rules set and throws errors if required.
-
-### **Taking through the process from start till the end with the help of images :-**
-
-### ![](Aspose.Words.4ed841ba-c4a1-427f-9c82-ad453c830393.003.png)
-![](Aspose.Words.4ed841ba-c4a1-427f-9c82-ad453c830393.004.png)
-
-![](Aspose.Words.4ed841ba-c4a1-427f-9c82-ad453c830393.005.png)
-
-![](Aspose.Words.4ed841ba-c4a1-427f-9c82-ad453c830393.006.png)
-
-![](Aspose.Words.4ed841ba-c4a1-427f-9c82-ad453c830393.007.jpeg)
-
-![](Aspose.Words.4ed841ba-c4a1-427f-9c82-ad453c830393.008.png)
-
-![](Aspose.Words.4ed841ba-c4a1-427f-9c82-ad453c830393.009.png)
-
-![](Aspose.Words.4ed841ba-c4a1-427f-9c82-ad453c830393.010.png)
-
-![](Aspose.Words.4ed841ba-c4a1-427f-9c82-ad453c830393.009.png)
-
-![](Aspose.Words.4ed841ba-c4a1-427f-9c82-ad453c830393.011.jpeg)
-
-### **Problems faced:**
-- Limited free resources available over the internet regarding working with PDF. There were only very limited usable libraries and packages related to PDF, others were deprecated and some software APIs charged fees for development use also.
-- Unavailability of any open source app which was built on blockchain and served our purpose of verification of Digitally signed PDFs which could come handy for our reference.
-- Steep learning curve of web3.0 development using new language, frameworks, required environments and useful dependencies.
-- Unexpected bugs whose solutions were not available on the internet for which we had to change our approach towards it a little bit or find a working solution for it.
-- The biggest challenge was our Hypothesis. 
+ 
 
 **Our hypothesis**: Attach the signature and then remove it to compare the hash.
 *Theoretically possible, Practically Impossible*
