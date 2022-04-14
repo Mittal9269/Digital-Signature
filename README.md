@@ -25,9 +25,10 @@ It gave us all the tools that we needed to start working on our application.
 ### **About the software:**
 The software we're working on will allow a user to digitally sign and verify a document's authenticity. In our current version, a single user can sign a document at multiple pages. Note that the verification of those signatures would not be accepted partially since it violates the integrity of the document. (For example, suppose a person signs on 4 pages of a 10 page document. So, if that pdf is split and then the verification for only a part of those pages is asked, then our software won’t accept such a signature).
 
-![](https://ibb.co/KhyJBPq)
+![](https://www.linkpicture.com/q/Registration-in-Blockchain-muti.png)
 
-![](https://ibb.co/x2j3LVr)
+![](https://www.linkpicture.com/q/Verifiaction-of-File.png)
+
 
 ### **Tools and Technologies Used:**
 - Frontend:
