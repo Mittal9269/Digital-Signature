@@ -27,7 +27,7 @@ The software we're working on will allow a user to digitally sign and verify a d
 
 ![](https://www.linkpicture.com/q/Registration-in-Blockchain-muti.png)
 
-![](https://www.linkpicture.com/q/Verifiaction-of-File.png)
+![](https://www.linkpicture.com/q/Verification_Software.jpeg)
 
 
 ### **Tools and Technologies Used:**
